@@ -1,0 +1,29 @@
+Package: multiCure
+Title: Multivariate Cure‐Rate Estimation and Testing
+Version: 0.0.0.9000
+Authors@R: 
+    person("Zhenyu", "Xu", , "zhenyu.xu@uconn.edu", role = c("aut", "cre"))
+Description: Provides estimation and hypothesis-testing tools for cure rates
+  in multivariate survival data.  Supports two-sample (paired and independent)
+  and K-sample Wald-type tests, covariance-weighted and simple-average 
+  estimators, pooled Kaplan–Meier cure probabilities, and Ying–Wei variance 
+  adjustments.
+License: MIT + file LICENSE
+URL: https://github.com/zhenyu1029/multiCure
+BugReports: https://github.com/zhenyu1029/multiCure/issues
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    survival,
+    dplyr,
+    rlang,
+    purrr,
+    prodlim
+Suggests:
+    copula,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
