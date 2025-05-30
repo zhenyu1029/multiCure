@@ -1,6 +1,6 @@
 Package: multiCure
 Title: Multivariate Cure‐Rate Estimation and Testing
-Version: 0.0.0.9000
+Version: 0.0.1.0
 Authors@R: 
     person("Zhenyu", "Xu", , "zhenyu.xu@uconn.edu", role = c("aut", "cre"))
 Description: Provides estimation and hypothesis-testing tools for cure rates
