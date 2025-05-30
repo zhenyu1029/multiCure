@@ -48,6 +48,7 @@ devtools::install_github("zhenyu1029/multiCure")
 ```{r}
 library(dplyr)
 library(multiCure)
+library(copula)
 
 # Define data generator
 genData2 <- function(n, tau, u_max1, u_max2, p1, p2, cure_time1, cure_time2, k1, k2, missing_prob = 0.1) {

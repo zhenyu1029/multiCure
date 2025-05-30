@@ -28,8 +28,23 @@ with:
 ``` r
 # install.packages("remotes")  # if you don't already have remotes
 remotes::install_github("zhenyu1029/multiCure")
-#> Skipping install of 'multiCure' from a github remote, the SHA1 (ccd416ae) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo zhenyu1029/multiCure@HEAD
+#> globals (0.17.0 -> 0.18.0) [CRAN]
+#> future  (1.40.0 -> 1.49.0) [CRAN]
+#> Installing 2 packages: globals, future
+#> 
+#> The downloaded binary packages are in
+#>  /var/folders/63/850579c17vs2038kgjtrdrn40000gn/T//RtmpmIWy5o/downloaded_packages
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>      checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpmIWy5o/remotes142011bd157f/zhenyu1029-multiCure-8dce19d/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpmIWy5o/remotes142011bd157f/zhenyu1029-multiCure-8dce19d/DESCRIPTION’
+#>   ─  preparing ‘multiCure’:
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>      Omitted ‘LazyData’ from DESCRIPTION
+#>   ─  building ‘multiCure_0.0.0.9000.tar.gz’
+#>      
+#> 
 ```
 
 Or using **devtools**:
@@ -37,7 +52,7 @@ Or using **devtools**:
 ``` r
 # install.packages("devtools")
 devtools::install_github("zhenyu1029/multiCure")
-#> Skipping install of 'multiCure' from a github remote, the SHA1 (ccd416ae) has not changed since last install.
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (8dce19d8) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -57,6 +72,7 @@ library(multiCure)
 #> Registered S3 method overwritten by 'future':
 #>   method               from      
 #>   all.equal.connection parallelly
+library(copula)
 
 # Define data generator
 genData2 <- function(n, tau, u_max1, u_max2, p1, p2, cure_time1, cure_time2, k1, k2, missing_prob = 0.1) {
