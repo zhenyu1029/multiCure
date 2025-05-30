@@ -1,53 +1,62 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
 # multiCure
 
-[![Build Status](https://github.com/zhenyu1029/multiCure/workflows/R-CMD-check/badge.svg)](https://github.com/zhenyu1029/multiCure/actions)
-[![Codecov test coverage](https://codecov.io/gh/zhenyu1029/multiCure/branch/main/graph/badge.svg)](https://codecov.io/gh/zhenyu1029/multiCure?branch=main)
+[![Build
+Status](https://github.com/zhenyu1029/multiCure/workflows/R-CMD-check/badge.svg)](https://github.com/zhenyu1029/multiCure/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/zhenyu1029/multiCure/branch/main/graph/badge.svg)](https://codecov.io/gh/zhenyu1029/multiCure?branch=main)
 [![R-CMD-check](https://github.com/zhenyu1029/multiCure/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zhenyu1029/multiCure/actions/workflows/R-CMD-check.yaml)
 
-The goal of **multiCure** is to provide estimation and hypothesis-testing tools 
-for cure rates in multivariate survival data. It supports:
+The goal of **multiCure** is to provide estimation and
+hypothesis-testing tools for cure rates in multivariate survival data.
+It supports:
 
-- Two‐sample (paired and independent) Wald‐type tests for comparing cure probabilities  
-- \(K\)‐sample Wald tests across multiple groups  
-- Covariance‐weighted, simple‐average, and pooled Kaplan–Meier estimators of the overall cure rate  
-- Ying–Wei variance adjustments for the pooled Kaplan–Meier curve  
+- Two‐sample (paired and independent) Wald‐type tests for comparing cure
+  probabilities  
+- $K$‐sample Wald tests across multiple groups  
+- Covariance‐weighted, simple‐average, and pooled Kaplan–Meier
+  estimators of the overall cure rate  
+- Ying–Wei variance adjustments for the pooled Kaplan–Meier curve
 
 ## Installation
 
-You can install the development version of **multiCure** from GitHub with:
+You can install the development version of **multiCure** from GitHub
+with:
 
-```{r}
+``` r
 # install.packages("remotes")  # if you don't already have remotes
 remotes::install_github("zhenyu1029/multiCure")
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (ccd416ae) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 Or using **devtools**:
 
-```{r}
+``` r
 # install.packages("devtools")
 devtools::install_github("zhenyu1029/multiCure")
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (ccd416ae) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 ## Basic Example
 
-```{r}
+``` r
 library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 library(multiCure)
+#> Registered S3 method overwritten by 'future':
+#>   method               from      
+#>   all.equal.connection parallelly
 
 # Define data generator
 genData2 <- function(n, tau, u_max1, u_max2, p1, p2, cure_time1, cure_time2, k1, k2, missing_prob = 0.1) {
@@ -116,6 +125,11 @@ two_paired <- test.2.cure(
   type = "paired"
 )
 print(two_paired)
+#> $test_stat
+#> [1] -0.006171028
+#> 
+#> $p_value
+#> [1] 0.9950763
 
 # Independent two‐sample test
 two_indep <- test.2.cure(
@@ -126,13 +140,63 @@ two_indep <- test.2.cure(
   type = "indep"
 )
 print(two_indep)
+#> $test_stat
+#> [1] -0.004598767
+#> 
+#> $p_value
+#> [1] 0.9963307
 
 # K‐sample Wald test (here with 2 groups yields same as independent)
 wald_k <- test.k.cure(long_df2, time, status, group)
 print(wald_k)
+#> $test_stat
+#> [1] 3.808159e-05
+#> 
+#> $p_value
+#> [1] 0.9950763
+#> 
+#> $df
+#> [1] 1
+#> 
+#> $invertible
+#> [1] TRUE
 
 # Estimation of cure rates
 estimates <- est.cure(long_df2, time, status, group)
 print(estimates)
+#> $weight_vec
+#> [1] 0.4148196 0.5851804
+#> 
+#> $weighted_est
+#> [1] 0.4056237
+#> 
+#> $var_weighted_est
+#> [1] 0.001184778
+#> 
+#> $ave_est
+#> [1] 0.4056012
+#> 
+#> $var_ave_est
+#> [1] 0.001198145
+#> 
+#> $pool_est
+#> [1] 0.406477
+#> 
+#> $var_pool_est
+#> [1] 0.0008379138
+#> 
+#> $yw_est
+#> [1] 0.406477
+#> 
+#> $var_yw_est
+#> [1] 0.0008268356
+#> 
+#> $cure_prob_list
+#> [1] 0.4054687 0.4057336
+#> 
+#> $var_cure_prob
+#> [1] 0.001815669 0.001501803
+#> 
+#> $invertible
+#> [1] TRUE
 ```
-
