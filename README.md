@@ -28,23 +28,8 @@ with:
 ``` r
 # install.packages("remotes")  # if you don't already have remotes
 remotes::install_github("zhenyu1029/multiCure")
-#> Downloading GitHub repo zhenyu1029/multiCure@HEAD
-#> globals (0.17.0 -> 0.18.0) [CRAN]
-#> future  (1.40.0 -> 1.49.0) [CRAN]
-#> Installing 2 packages: globals, future
-#> 
-#> The downloaded binary packages are in
-#>  /var/folders/63/850579c17vs2038kgjtrdrn40000gn/T//RtmpmIWy5o/downloaded_packages
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>      checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpmIWy5o/remotes142011bd157f/zhenyu1029-multiCure-8dce19d/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpmIWy5o/remotes142011bd157f/zhenyu1029-multiCure-8dce19d/DESCRIPTION’
-#>   ─  preparing ‘multiCure’:
-#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>      Omitted ‘LazyData’ from DESCRIPTION
-#>   ─  building ‘multiCure_0.0.0.9000.tar.gz’
-#>      
-#> 
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (dedb3531) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 Or using **devtools**:
@@ -52,7 +37,7 @@ Or using **devtools**:
 ``` r
 # install.packages("devtools")
 devtools::install_github("zhenyu1029/multiCure")
-#> Skipping install of 'multiCure' from a github remote, the SHA1 (8dce19d8) has not changed since last install.
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (dedb3531) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -75,62 +60,87 @@ library(multiCure)
 library(copula)
 
 # Define data generator
-genData2 <- function(n, tau, u_max1, u_max2, p1, p2, cure_time1, cure_time2, k1, k2, missing_prob = 0.1) {
+genData2_long <- function(n, tau, u_max1, u_max2, p1, p2, cure_time1, cure_time2, k1, k2, missing_prob = 0.1) {
+  # Calculate the copula parameter theta from Kendall's tau
   theta <- copula::iTau(copula::claytonCopula(dim = 2), tau)
-  u     <- copula::rCopula(n, copula::claytonCopula(theta, dim = 2))
-  u2    <- copula::rCopula(n, copula::claytonCopula(theta, dim = 2))
-
+  
+  # Generate U(0,1) variates from a Clayton copula for survival times
+  u <- copula::rCopula(n, copula::claytonCopula(theta, dim = 2))
+  # Generate U(0,1) variates from a Clayton copula for cure status
+  u2 <- copula::rCopula(n, copula::claytonCopula(theta, dim = 2))
+  
+  # --- Group 1 Calculations ---
+  # Inverse transform to get potential event times for non-cured in group 1
   t1_u <- (-log(1 - (1 - exp(-cure_time1^k1)) * u[, 1]))^(1 / k1)
-  t2_u <- (-log(1 - (1 - exp(-cure_time2^k2)) * u[, 2]))^(1 / k2)
-
+  # Determine cure status for group 1 based on p1
   cured1 <- as.integer(u2[, 1] <= p1)
-  cured2 <- as.integer(u2[, 2] <= p2)
-
+  # Assign event time: Inf if cured, otherwise t1_u
   t1 <- ifelse(cured1 == 1, Inf, t1_u)
-  t2 <- ifelse(cured2 == 1, Inf, t2_u)
-
+  # Generate censoring times for group 1
   c1 <- runif(n, 0, u_max1)
-  c2 <- runif(n, 0, u_max2)
-
-  o1 <- pmin(t1, c1); d1 <- as.integer(t1 <= c1)
-  o2 <- pmin(t2, c2); d2 <- as.integer(t2 <= c2)
-
-  # Introduce missingness
+  # Calculate observed time and status for group 1
+  o1 <- pmin(t1, c1)
+  d1 <- as.integer(t1 <= c1)
+  
+  # Introduce missingness for Group 1
   miss1 <- runif(n) < missing_prob
+  o1[miss1] <- NA
+  d1[miss1] <- NA
+  
+  # --- Group 2 Calculations ---
+  # Inverse transform to get potential event times for non-cured in group 2
+  t2_u <- (-log(1 - (1 - exp(-cure_time2^k2)) * u[, 2]))^(1 / k2)
+  # Determine cure status for group 2 based on p2
+  cured2 <- as.integer(u2[, 2] <= p2)
+  # Assign event time: Inf if cured, otherwise t2_u
+  t2 <- ifelse(cured2 == 1, Inf, t2_u)
+  # Generate censoring times for group 2
+  c2 <- runif(n, 0, u_max2)
+  # Calculate observed time and status for group 2
+  o2 <- pmin(t2, c2)
+  d2 <- as.integer(t2 <= c2)
+  
+  # Introduce missingness for Group 2
   miss2 <- runif(n) < missing_prob
-
-  o1[miss1] <- NA; d1[miss1] <- NA
-  o2[miss2] <- NA; d2[miss2] <- NA
-
-  data.frame(id = seq_len(n), observed_time_1 = o1, status_1 = d1,
-                               observed_time_2 = o2, status_2 = d2)
+  o2[miss2] <- NA
+  d2[miss2] <- NA
+  
+  # Create data frames for each group
+  df_g1 <- data.frame(
+    id = seq_len(n),
+    group = factor("1", levels = c("1", "2")),
+    time = o1,
+    status = d1
+  )
+  
+  df_g2 <- data.frame(
+    id = seq_len(n),
+    group = factor("2", levels = c("1", "2")),
+    time = o2,
+    status = d2
+  )
+  
+  # Combine the two group data frames into a single long format data frame
+  long_df <- rbind(df_g1, df_g2)
+  
+  return(long_df)
 }
 
 # Simulate two‐sample cure‐rate data
 set.seed(123)
-df2 <- genData2(
-  n            = 200,
-  tau          = 0.5,
-  u_max1       = 5,
-  u_max2       = 6,
-  p1           = 0.4,
-  p2           = 0.4,
-  cure_time1   = 10,
-  cure_time2   = 12,
-  k1           = 1.5,
-  k2           = 2.0,
+long_df2 <- genData2_long(
+  n = 200,
+  tau = 0.5,
+  u_max1 = 5,
+  u_max2 = 6,
+  p1 = 0.4,
+  p2 = 0.4,
+  cure_time1 = 10,
+  cure_time2 = 12,
+  k1 = 1.5,
+  k2 = 2.0,
   missing_prob = 0.05
 )
-
-# Pivot to long format
-long_df2 <- df2 %>%
-  tidyr::pivot_longer(
-    cols          = -id,
-    names_to      = c(".value", "group"),
-    names_pattern = "(observed_time|status)_(\\d)"
-  ) %>%
-  mutate(group = factor(group, levels = c("1","2"))) %>%
-  rename(time = observed_time)
 
 # Paired two‐sample test
 two_paired <- test.2.cure(
@@ -142,10 +152,10 @@ two_paired <- test.2.cure(
 )
 print(two_paired)
 #> $test_stat
-#> [1] -0.006171028
+#> [1] -0.1232064
 #> 
 #> $p_value
-#> [1] 0.9950763
+#> [1] 0.9019437
 
 # Independent two‐sample test
 two_indep <- test.2.cure(
@@ -157,19 +167,19 @@ two_indep <- test.2.cure(
 )
 print(two_indep)
 #> $test_stat
-#> [1] -0.004598767
+#> [1] -0.09068138
 #> 
 #> $p_value
-#> [1] 0.9963307
+#> [1] 0.9277458
 
 # K‐sample Wald test (here with 2 groups yields same as independent)
 wald_k <- test.k.cure(long_df2, time, status, group)
 print(wald_k)
 #> $test_stat
-#> [1] 3.808159e-05
+#> [1] 0.01517981
 #> 
 #> $p_value
-#> [1] 0.9950763
+#> [1] 0.9019437
 #> 
 #> $df
 #> [1] 1
@@ -181,37 +191,37 @@ print(wald_k)
 estimates <- est.cure(long_df2, time, status, group)
 print(estimates)
 #> $weight_vec
-#> [1] 0.4148196 0.5851804
+#> [1] 0.4506688 0.5493312
 #> 
 #> $weighted_est
-#> [1] 0.4056237
+#> [1] 0.3976998
 #> 
 #> $var_weighted_est
-#> [1] 0.001184778
+#> [1] 0.001212122
 #> 
 #> $ave_est
-#> [1] 0.4056012
+#> [1] 0.3974414
 #> 
 #> $var_ave_est
-#> [1] 0.001198145
+#> [1] 0.001216521
 #> 
 #> $pool_est
-#> [1] 0.406477
+#> [1] 0.3987973
 #> 
 #> $var_pool_est
-#> [1] 0.0008379138
+#> [1] 0.0008448245
 #> 
 #> $yw_est
-#> [1] 0.406477
+#> [1] 0.3987973
 #> 
 #> $var_yw_est
-#> [1] 0.0008268356
+#> [1] 0.0008333953
 #> 
 #> $cure_prob_list
-#> [1] 0.4054687 0.4057336
+#> [1] 0.3948223 0.4000606
 #> 
 #> $var_cure_prob
-#> [1] 0.001815669 0.001501803
+#> [1] 0.001757597 0.001579253
 #> 
 #> $invertible
 #> [1] TRUE
