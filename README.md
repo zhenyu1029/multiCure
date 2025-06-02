@@ -28,8 +28,23 @@ with:
 ``` r
 # install.packages("remotes")  # if you don't already have remotes
 remotes::install_github("zhenyu1029/multiCure")
-#> Skipping install of 'multiCure' from a github remote, the SHA1 (dedb3531) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo zhenyu1029/multiCure@HEAD
+#> globals (0.17.0 -> 0.18.0) [CRAN]
+#> future  (1.40.0 -> 1.49.0) [CRAN]
+#> Installing 2 packages: globals, future
+#> 
+#> The downloaded binary packages are in
+#>  /var/folders/63/850579c17vs2038kgjtrdrn40000gn/T//RtmpuQYUXH/downloaded_packages
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>      checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpuQYUXH/remotes80f76ee96c9d/zhenyu1029-multiCure-3833a8e/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/63/850579c17vs2038kgjtrdrn40000gn/T/RtmpuQYUXH/remotes80f76ee96c9d/zhenyu1029-multiCure-3833a8e/DESCRIPTION’
+#>   ─  preparing ‘multiCure’:
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>      Omitted ‘LazyData’ from DESCRIPTION
+#>   ─  building ‘multiCure_0.1.1.tar.gz’
+#>      
+#> 
 ```
 
 Or using **devtools**:
@@ -37,7 +52,7 @@ Or using **devtools**:
 ``` r
 # install.packages("devtools")
 devtools::install_github("zhenyu1029/multiCure")
-#> Skipping install of 'multiCure' from a github remote, the SHA1 (dedb3531) has not changed since last install.
+#> Skipping install of 'multiCure' from a github remote, the SHA1 (3833a8ef) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -141,6 +156,14 @@ long_df2 <- genData2_long(
   k2 = 2.0,
   missing_prob = 0.05
 )
+head(long_df2)
+#>   id group      time status
+#> 1  1     1 0.4862635      1
+#> 2  2     1 1.8292274      0
+#> 3  3     1 0.6063603      0
+#> 4  4     1 0.2349684      0
+#> 5  5     1 1.3139815      0
+#> 6  6     1 0.1295460      1
 
 # Paired two‐sample test
 two_paired <- test.2.cure(

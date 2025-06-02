@@ -132,6 +132,7 @@ long_df2 <- genData2_long(
   k2 = 2.0,
   missing_prob = 0.05
 )
+head(long_df2)
 
 # Paired two‐sample test
 two_paired <- test.2.cure(
