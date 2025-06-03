@@ -105,7 +105,6 @@ print.summary.cure_test <- function(x, ...) {
   cat("Alternative Hypothesis: cure probabilities differ\n")
 
   invisible(x)
-
 }
 
 #---------------------------------------------
@@ -184,7 +183,6 @@ print.summary.cure_k_test <- function(x, ...) {
   invisible(x)
 }
 
-
 #---------------------------------------------
 # 6) print.cure_est: print for est.cure()
 #---------------------------------------------
@@ -195,34 +193,39 @@ print.cure_est <- function(x, ...) {
   cat(header, "\n")
   cat(strrep("-", nchar(header)), "\n", sep = "")
 
-  # 4a) Weighted estimator
-  cat(sprintf("Weighted estimator:     %.4f (Var = %.4f)\n",
-              x$weighted_est, x$var_weighted_est))
+  # 6a) Weighted estimator - report SE instead of variance
+  se_weighted <- sqrt(x$var_weighted_est)
+  cat(sprintf("Weighted estimator:     %.4f (SE = %.4f)\n",
+              x$weighted_est, se_weighted))
 
-  # 4b) Simple average estimator
-  cat(sprintf("Simple average:        %.4f (Var = %.4f)\n",
-              x$ave_est, x$var_ave_est))
+  # 6b) Simple average estimator - report SE
+  se_ave <- sqrt(x$var_ave_est)
+  cat(sprintf("Simple average:        %.4f (SE = %.4f)\n",
+              x$ave_est, se_ave))
 
-  # 4c) Pooled KM estimator
-  cat(sprintf("Pooled KM estimator:   %.4f (Var = %.4f)\n",
-              x$pool_est, x$var_pool_est))
+  # 6c) Pooled KM estimator - report SE
+  se_pool <- sqrt(x$var_pool_est)
+  cat(sprintf("Pooled KM estimator:   %.4f (SE = %.4f)\n",
+              x$pool_est, se_pool))
 
-  # 4d) Ying-Wei estimator
-  cat(sprintf("Ying-Wei estimator:    %.4f (Var = %.4f)\n",
-              x$yw_est, x$var_yw_est))
+  # 6d) Ying-Wei estimator - report SE
+  se_yw <- sqrt(x$var_yw_est)
+  cat(sprintf("Ying-Wei estimator:    %.4f (SE = %.4f)\n",
+              x$yw_est, se_yw))
 
-  # 4e) Per-margin cure rates
+  # 6e) Per-margin cure rates - report SE
   if (!is.null(x$margin_names) && length(x$margin_names) == length(x$cure_prob_list)) {
     cat("\nPer-margin cure rates:\n")
     for (i in seq_along(x$margin_names)) {
-      cat(sprintf("  %s: %.4f  (Var = %.4f)\n",
+      se_margin <- sqrt(x$var_cure_prob[i])
+      cat(sprintf("  %s: %.4f  (SE = %.4f)\n",
                   x$margin_names[i],
                   x$cure_prob_list[i],
-                  x$var_cure_prob[i]))
+                  se_margin))
     }
   }
 
-  # 4f) Warn if weighted covariance was singular
+  # 6f) Warn if weighted covariance was singular
   if (!x$invertible) {
     cat("\nWARNING: Covariance matrix was not invertible-weighted estimator may be unreliable.\n")
   }

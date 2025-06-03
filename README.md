@@ -169,7 +169,7 @@ summary(two_paired)
 #>   1: 0.3948
 #>   2: 0.4001
 #> 
-#> Difference ( 1 − 2 ) = -0.0052
+#> Difference ( 1 - 2 ) = -0.0052
 #> 95% CI for difference: [ -0.0886 , 0.0781 ]
 #> 
 #> Test statistic = -0.1232   p-value = 0.9019
@@ -197,7 +197,7 @@ summary(two_indep)
 #>   1: 0.3948
 #>   2: 0.4001
 #> 
-#> Difference ( 1 − 2 ) = -0.0052
+#> Difference ( 1 - 2 ) = -0.0052
 #> 95% CI for difference: [ -0.1185 , 0.1080 ]
 #> 
 #> Test statistic = -0.0907   p-value = 0.9277
@@ -221,12 +221,12 @@ estimates <- est.cure(long_df2, time, status, margin)
 print(estimates)
 #> Cure-Rate Estimates 
 #> -------------------
-#> Weighted estimator:     0.3977 (Var = 0.0012)
-#> Simple average:        0.3974 (Var = 0.0012)
-#> Pooled KM estimator:   0.3988 (Var = 0.0008)
-#> Ying-Wei estimator:    0.3988 (Var = 0.0008)
+#> Weighted estimator:     0.3977 (SE = 0.0348)
+#> Simple average:        0.3974 (SE = 0.0349)
+#> Pooled KM estimator:   0.3988 (SE = 0.0291)
+#> Ying-Wei estimator:    0.3988 (SE = 0.0289)
 #> 
 #> Per-margin cure rates:
-#>   1: 0.3948  (Var = 0.0018)
-#>   2: 0.4001  (Var = 0.0016)
+#>   1: 0.3948  (SE = 0.0419)
+#>   2: 0.4001  (SE = 0.0397)
 ```
