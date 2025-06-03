@@ -144,6 +144,7 @@ two_paired <- test.2.cure(
   type = "paired"
 )
 print(two_paired)
+summary(two_paired)
 
 # Independent two‐sample test
 two_indep <- test.2.cure(
@@ -154,10 +155,11 @@ two_indep <- test.2.cure(
   type = "indep"
 )
 print(two_indep)
+summary(two_indep)
 
 # K‐sample Wald test (here with 2 margins yields same as independent)
 wald_k <- test.k.cure(long_df2, time, status, margin)
-print(wald_k)
+summary(wald_k)
 
 # Estimation of cure rates
 estimates <- est.cure(long_df2, time, status, margin)

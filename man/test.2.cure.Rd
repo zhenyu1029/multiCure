@@ -9,7 +9,7 @@ test.2.cure(df, time, status, margin, type = c("paired", "indep"))
 \arguments{
 \item{df}{A data frame in long format (one row per subject*margin).}
 
-\item{time}{Unquoted name of the time column.}
+\item{time}{Unquoted name of the follow-up time column.}
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
@@ -18,13 +18,21 @@ test.2.cure(df, time, status, margin, type = c("paired", "indep"))
 \item{type}{Character: \code{"paired"} (default) or \code{"indep"}.}
 }
 \value{
-A list with components:
+An object of class \code{"cure_test"}, which is a list containing:
 \describe{
-\item{test_stat}{Numeric test statistic.}
+\item{test_stat}{Numeric Wald statistic.}
 \item{p_value}{Two-sided p-value.}
+\item{type}{Either \code{"paired"} or \code{"indep"}.}
+\item{margin_names}{Character vector of the two margin levels.}
+\item{estimates}{Length-2 numeric vector of cure estimates (p̂₁, p̂₂).}
+\item{var_diff}{Variance of (p̂₁ − p̂₂).}
+\item{V}{2×2 covariance matrix of (p̂₁, p̂₂) if \code{type == "paired"}, otherwise NULL.}
+\item{v1}{Var(p̂₁) if \code{type == "indep"}, otherwise NULL.}
+\item{v2}{Var(p̂₂) if \code{type == "indep"}, otherwise NULL.}
 }
 }
 \description{
 Performs a Wald-type test comparing cure rates between two margins,
-in either paired or independent fashion.
+in either paired or independent fashion, and stores enough information
+so that a 95 \% CI for (p̂₁ − p̂₂) can be computed.
 }

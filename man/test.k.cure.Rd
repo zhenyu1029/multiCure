@@ -13,17 +13,18 @@ test.k.cure(df, time, status, margin)
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
-\item{margin}{Unquoted name of the grouping factor (with >= 2 levels).}
+\item{margin}{Unquoted name of the grouping factor (>= 2 levels).}
 }
 \value{
-A list with:
+An object of class \code{"cure_k_test"}, a list containing:
 \describe{
-\item{test_stat}{Wald statistic.}
-\item{p_value}{p-value of the \\(\\chi^2_{K-1}\\) test.}
-\item{df}{Degrees of freedom (\\(K-1\\)).}
-\item{invertible}{Logical, whether contrast covariance was invertible.}
+\item{test_stat}{Wald statistic (χ²).}
+\item{p_value}{p-value of χ²ₖ₋₁ test.}
+\item{df}{Degrees of freedom (k−1).}
+\item{invertible}{Logical, was the contrast covariance invertible?}
+\item{margin_names}{Character vector of all margin levels.}
 }
 }
 \description{
-Tests equality of cure probabilities across \\(K\\) margins using a multivariate Wald statistic.
+Tests equality of cure probabilities across K margins using a multivariate Wald statistic.
 }

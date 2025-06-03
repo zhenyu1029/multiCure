@@ -156,11 +156,24 @@ two_paired <- test.2.cure(
   type = "paired"
 )
 print(two_paired)
-#> $test_stat
-#> [1] -0.1232064
+#> Two-Sample Cure Rate Test (Paired) 
+#> ----------------------------------
+#> data:  1 vs 2
+#> Test Statistic:  -0.1232
+#> P-Value:         0.9019
+#> Alternative Hypothesis: cure probabilities differ
+summary(two_paired)
+#> Two-Sample Cure Rate Test (Paired, 95% CI) 
+#> ------------------------------------------
+#> Estimated cure rate:
+#>   1: 0.3948
+#>   2: 0.4001
 #> 
-#> $p_value
-#> [1] 0.9019437
+#> Difference ( 1 − 2 ) = -0.0052
+#> 95% CI for difference: [ -0.0886 , 0.0781 ]
+#> 
+#> Test statistic = -0.1232   p-value = 0.9019
+#> Alternative Hypothesis: cure probabilities differ
 
 # Independent two‐sample test
 two_indep <- test.2.cure(
@@ -171,63 +184,49 @@ two_indep <- test.2.cure(
   type = "indep"
 )
 print(two_indep)
-#> $test_stat
-#> [1] -0.09068138
+#> Two-Sample Cure Rate Test (Independent) 
+#> ---------------------------------------
+#> data:  1 vs 2
+#> Test Statistic:  -0.0907
+#> P-Value:         0.9277
+#> Alternative Hypothesis: cure probabilities differ
+summary(two_indep)
+#> Two-Sample Cure Rate Test (Independent, 95% CI) 
+#> -----------------------------------------------
+#> Estimated cure rate:
+#>   1: 0.3948
+#>   2: 0.4001
 #> 
-#> $p_value
-#> [1] 0.9277458
+#> Difference ( 1 − 2 ) = -0.0052
+#> 95% CI for difference: [ -0.1185 , 0.1080 ]
+#> 
+#> Test statistic = -0.0907   p-value = 0.9277
+#> Alternative Hypothesis: cure probabilities differ
 
 # K‐sample Wald test (here with 2 margins yields same as independent)
 wald_k <- test.k.cure(long_df2, time, status, margin)
-print(wald_k)
-#> $test_stat
-#> [1] 0.01517981
+summary(wald_k)
+#> K-Sample Cure Rate Wald Test (Summary) 
+#> --------------------------------------
+#> Margins:  1, 2 
 #> 
-#> $p_value
-#> [1] 0.9019437
+#> Test Statistic (Chi^2):  0.0152
+#> Degrees of Freedom:      1
+#> P-Value:                 0.9019
 #> 
-#> $df
-#> [1] 1
-#> 
-#> $invertible
-#> [1] TRUE
+#> Alternative Hypothesis: At least one margin's cure probability differs.
 
 # Estimation of cure rates
 estimates <- est.cure(long_df2, time, status, margin)
 print(estimates)
-#> $weight_vec
-#> [1] 0.4506688 0.5493312
+#> Cure-Rate Estimates 
+#> -------------------
+#> Weighted estimator:     0.3977 (Var = 0.0012)
+#> Simple average:        0.3974 (Var = 0.0012)
+#> Pooled KM estimator:   0.3988 (Var = 0.0008)
+#> Ying-Wei estimator:    0.3988 (Var = 0.0008)
 #> 
-#> $weighted_est
-#> [1] 0.3976998
-#> 
-#> $var_weighted_est
-#> [1] 0.001212122
-#> 
-#> $ave_est
-#> [1] 0.3974414
-#> 
-#> $var_ave_est
-#> [1] 0.001216521
-#> 
-#> $pool_est
-#> [1] 0.3987973
-#> 
-#> $var_pool_est
-#> [1] 0.0008448245
-#> 
-#> $yw_est
-#> [1] 0.3987973
-#> 
-#> $var_yw_est
-#> [1] 0.0008333953
-#> 
-#> $cure_prob_list
-#> [1] 0.3948223 0.4000606
-#> 
-#> $var_cure_prob
-#> [1] 0.001757597 0.001579253
-#> 
-#> $invertible
-#> [1] TRUE
+#> Per-margin cure rates:
+#>   1: 0.3948  (Var = 0.0018)
+#>   2: 0.4001  (Var = 0.0016)
 ```

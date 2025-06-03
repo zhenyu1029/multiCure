@@ -13,26 +13,27 @@ est.cure(df, time, status, margin)
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
-\item{margin}{Unquoted name of the grouping factor.}
+\item{margin}{Unquoted name of the grouping factor (≥ 2 levels).}
 }
 \value{
-A list containing:
+An object of class \code{"cure_est"}, which is a list containing:
 \describe{
 \item{weight_vec}{Weights for the covariance-weighted estimator.}
 \item{weighted_est}{Weighted cure-rate estimate.}
 \item{var_weighted_est}{Variance of the weighted estimate.}
 \item{ave_est}{Simple-average cure-rate estimate.}
 \item{var_ave_est}{Variance of the simple average.}
-\item{pool_est}{Pooled Kaplan-Meier cure probability.}
+\item{pool_est}{Pooled Kaplan–Meier cure probability.}
 \item{var_pool_est}{Variance of the pooled estimate.}
 \item{yw_est}{Ying-Wei variance-corrected KM estimate.}
 \item{var_yw_est}{Variance of the Ying-Wei estimate.}
-\item{cure_prob_list}{Per-margin KM cure probabilities.}
-\item{var_cure_prob}{Per-margin variances (diagonal of covariance).}
-\item{invertible}{Logical, whether the weighted system was invertible.}
+\item{cure_prob_list}{Per-margin KM cure probabilities (length = K).}
+\item{var_cure_prob}{Per-margin variances (diagonal of V).}
+\item{invertible}{Logical—was V invertible?}
+\item{margin_names}{Character vector of margin levels.}
 }
 }
 \description{
-Computes three overall estimators of the cure rate-covariance-weighted,
-simple average, and pooled Kaplan-Meier-as well as the Ying-Wei variance-adjusted KM.
+Computes three overall estimators of the cure rate—covariance-weighted,
+simple average, and pooled Kaplan–Meier—as well as the Ying-Wei variance-adjusted KM.
 }
