@@ -3,7 +3,7 @@
 #' @importFrom rlang    enquo !!
 #' @importFrom purrr    map map_int
 #' @importFrom survival survfit Surv cluster
-#' @importFrom prodlim  prodlim Hist 
+#' @importFrom prodlim  prodlim Hist
 NULL
 
 
@@ -37,7 +37,7 @@ solve.system <- function(A, vec) {
 #' @description
 #' Builds a \\((k-1)\\times k\\) matrix with rows \\((1,-1,0,\\dots)\\), \\((0,1,-1,0,\\dots)\\), etc.
 #'
-#' @param k Integer number of groups.
+#' @param k Integer number of margins.
 #'
 #' @return A \\((k-1)\\times k\\) numeric matrix.
 #'
@@ -56,7 +56,7 @@ construct.C <- function(k) {
 #' @title Influence function for Kaplan-Meier cure probability
 #'
 #' @description
-#' Computes the influence-function values \\(\\xi_j\\) for a single group at a specified time point.
+#' Computes the influence-function values \\(\\xi_j\\) for a single margin at a specified time point.
 #'
 #' @param times1 Numeric vector of observed times (may include NAs).
 #' @param status1 Integer vector (0/1) indicating censoring/event, same length as `times1`.
@@ -69,13 +69,13 @@ construct.C <- function(k) {
 est.inf.fun <- function(times1, status1, surv_prob_at_last_event_time1, time_point1) {
   times_nonna <- na.omit(times1)
   risk_nonna  <- sapply(times_nonna, function(t) sum(times_nonna >= t))
-  
+
   risk_set <- rep(NA_integer_, length(times1))
   risk_set[!is.na(times1)] <- risk_nonna
-  
+
   n  <- length(times1)
   xi <- numeric(n)
-  
+
   for (j in seq_len(n)) {
     if (!is.na(times1[j])) {
       first_term <- 0
@@ -90,11 +90,11 @@ est.inf.fun <- function(times1, status1, surv_prob_at_last_event_time1, time_poi
         }
       }
       second_term <- second_term / n
-      
+
       xi[j] <- -surv_prob_at_last_event_time1 * (first_term - second_term)
     }
   }
-  
+
   xi
 }
 
@@ -103,12 +103,12 @@ est.inf.fun <- function(times1, status1, surv_prob_at_last_event_time1, time_poi
 #' @title Covariance matrix of cure-probability influence functions
 #'
 #' @description
-#' Given lists of per-group times and statuses, computes the covariance matrix of the influence functions.
+#' Given lists of per-margin times and statuses, computes the covariance matrix of the influence functions.
 #'
-#' @param times_list List of numeric vectors (one per group), all the same length (padded with NAs).
+#' @param times_list List of numeric vectors (one per margin), all the same length (padded with NAs).
 #' @param status_list List of integer (0/1) vectors, same structure as `times_list`.
-#' @param surv_prob_at_last_event_time_list Numeric vector of KM estimates (length = number of groups).
-#' @param time_points_list Numeric vector of evaluation times (length = number of groups).
+#' @param surv_prob_at_last_event_time_list Numeric vector of KM estimates (length = number of margins).
+#' @param time_points_list Numeric vector of evaluation times (length = number of margins).
 #'
 #' @return A \\(k \\times k\\) covariance matrix.
 #'
@@ -121,12 +121,12 @@ est.cov <- function(
 ) {
   k     <- length(times_list)
   n_obs <- length(times_list[[1]])
-  
+
   if (any(map_int(times_list, length) != n_obs) ||
       any(map_int(status_list, length) != n_obs)) {
-    stop("All groups must have the same number of observations (use .long_to_lists to pad).")
+    stop("All margins must have the same number of observations (use .long_to_lists to pad).")
   }
-  
+
   influence_mat <- matrix(NA_real_, nrow = n_obs, ncol = k)
   for (i in seq_len(k)) {
     influence_mat[, i] <- est.inf.fun(
@@ -136,22 +136,22 @@ est.cov <- function(
       time_point1 = time_points_list[[i]]
     )
   }
-  
+
   (t(influence_mat) %*% influence_mat) / (n_obs^2)
 }
 
 
 
-#' @title Split and pad a long data frame by group
+#' @title Split and pad a long data frame by margin
 #'
 #' @description
-#' Splits a long-format data frame by `group`, extracts `time` and `status` into lists,
+#' Splits a long-format data frame by `margin`, extracts `time` and `status` into lists,
 #' and pads each list with NAs so they are all equal length.
 #'
 #' @param df A data frame.
 #' @param time Unquoted column name of follow-up time.
 #' @param status Unquoted column name of event indicator (0/1).
-#' @param group Unquoted column name of grouping factor.
+#' @param margin Unquoted column name of grouping factor.
 #'
 #' @return A list with elements:
 #' \describe{
@@ -160,22 +160,22 @@ est.cov <- function(
 #' }
 #'
 #' @keywords internal
-.long_to_lists <- function(df, time, status, group) {
+.long_to_lists <- function(df, time, status, margin) {
   time   <- enquo(time)
   status <- enquo(status)
-  group  <- enquo(group)
-  
+  margin  <- enquo(margin)
+
   raw_split <- df %>%
-    group_by(!!group) %>%
+    group_by(!!margin) %>%
     group_split()
-  
+
   times_list  <- map(raw_split, ~ pull(.x, !!time))
   status_list <- map(raw_split, ~ pull(.x, !!status))
-  
+
   max_n <- max(lengths(times_list))
   times_list  <- map(times_list,  ~ c(.x, rep(NA, max_n - length(.x))))
   status_list <- map(status_list, ~ c(.x, rep(NA, max_n - length(.x))))
-  
+
   list(times_list = times_list, status_list = status_list)
 }
 
@@ -184,13 +184,13 @@ est.cov <- function(
 #' @title Two-sample cure-rate test
 #'
 #' @description
-#' Performs a Wald-type test comparing cure rates between two groups,
+#' Performs a Wald-type test comparing cure rates between two margins,
 #' in either paired or independent fashion.
 #'
-#' @param df A data frame in long format (one row per subject*group).
+#' @param df A data frame in long format (one row per subject*margin).
 #' @param time Unquoted name of the time column.
 #' @param status Unquoted name of the event indicator column (0/1).
-#' @param group Unquoted name of the grouping variable (two levels).
+#' @param margin Unquoted name of the grouping variable (two levels).
 #' @param type Character: `"paired"` (default) or `"indep"`.
 #'
 #' @return A list with components:
@@ -200,22 +200,22 @@ est.cov <- function(
 #' }
 #'
 #' @export
-test.2.cure <- function(df, time, status, group, type = c("paired", "indep")) {
+test.2.cure <- function(df, time, status, margin, type = c("paired", "indep")) {
   type <- match.arg(type)
-  ls   <- .long_to_lists(df, time, status, group)
+  ls   <- .long_to_lists(df, time, status, margin)
   times_list  <- ls$times_list
   status_list <- ls$status_list
   k           <- length(times_list)
-  
+
   tau_hat <- p_hat <- numeric(k)
   for (i in seq_len(k)) {
     fit        <- survfit(Surv(times_list[[i]], status_list[[i]]) ~ 1)
     tau_hat[i] <- max(times_list[[i]], na.rm = TRUE)
     p_hat[i]   <- summary(fit, times = tau_hat[i], extend = TRUE)$surv
   }
-  
+
   if (type == "paired") {
-    if (k != 2) stop("paired cure rate test requires exactly two groups")
+    if (k != 2) stop("paired cure rate test requires exactly two margins")
     V <- est.cov(
       times_list                        = times_list,
       status_list                       = status_list,
@@ -225,7 +225,7 @@ test.2.cure <- function(df, time, status, group, type = c("paired", "indep")) {
     stat <- (p_hat[1] - p_hat[2]) / sqrt(V[1,1] + V[2,2] - 2 * V[1,2])
     pval <- 2 * pnorm(-abs(stat))
   } else {
-    if (k != 2) stop("paired cure rate test requires exactly two groups")
+    if (k != 2) stop("paired cure rate test requires exactly two margins")
     xi1  <- est.inf.fun(times_list[[1]], status_list[[1]], p_hat[1], tau_hat[1])
     xi2  <- est.inf.fun(times_list[[2]], status_list[[2]], p_hat[2], tau_hat[2])
     v1   <- sum(xi1^2) / (length(xi1)^2)
@@ -233,21 +233,21 @@ test.2.cure <- function(df, time, status, group, type = c("paired", "indep")) {
     stat <- (p_hat[1] - p_hat[2]) / sqrt(v1 + v2)
     pval <- 2 * pnorm(-abs(stat))
   }
-  
+
   list(test_stat = stat, p_value = pval)
 }
 
 
 
-#' @title Wald test across K groups for cure probabilities
+#' @title Wald test across K margins for cure probabilities
 #'
 #' @description
-#' Tests equality of cure probabilities across \\(K\\) groups using a multivariate Wald statistic.
+#' Tests equality of cure probabilities across \\(K\\) margins using a multivariate Wald statistic.
 #'
 #' @param df A data frame in long format.
 #' @param time Unquoted name of the time column.
 #' @param status Unquoted name of the event indicator column (0/1).
-#' @param group Unquoted name of the grouping factor (with >= 2 levels).
+#' @param margin Unquoted name of the grouping factor (with >= 2 levels).
 #'
 #' @return A list with:
 #' \describe{
@@ -258,19 +258,19 @@ test.2.cure <- function(df, time, status, group, type = c("paired", "indep")) {
 #' }
 #'
 #' @export
-test.k.cure <- function(df, time, status, group) {
-  ls   <- .long_to_lists(df, time, status, group)
+test.k.cure <- function(df, time, status, margin) {
+  ls   <- .long_to_lists(df, time, status, margin)
   times_list  <- ls$times_list
   status_list <- ls$status_list
   k           <- length(times_list)
-  
+
   tau_hat <- p_hat <- numeric(k)
   for (i in seq_len(k)) {
     fit        <- survfit(Surv(times_list[[i]], status_list[[i]]) ~ 1)
     tau_hat[i] <- max(times_list[[i]], na.rm = TRUE)
     p_hat[i]   <- summary(fit, times = tau_hat[i], extend = TRUE)$surv
   }
-  
+
   V   <- est.cov(
     times_list                        = times_list,
     status_list                       = status_list,
@@ -279,10 +279,10 @@ test.k.cure <- function(df, time, status, group) {
   )
   C   <- construct.C(k)
   sol <- solve.system(C %*% V %*% t(C), C %*% p_hat)
-  
+
   W    <- as.numeric(t(C %*% p_hat) %*% sol$solve)
   pval <- 1 - pchisq(W, df = k - 1)
-  
+
   list(
     test_stat  = W,
     p_value    = pval,
@@ -302,7 +302,7 @@ test.k.cure <- function(df, time, status, group) {
 #' @param df A data frame in long format.
 #' @param time Unquoted name of the time column.
 #' @param status Unquoted name of the event indicator column (0/1).
-#' @param group Unquoted name of the grouping factor.
+#' @param margin Unquoted name of the grouping factor.
 #'
 #' @return A list containing:
 #' \describe{
@@ -315,25 +315,25 @@ test.k.cure <- function(df, time, status, group) {
 #'   \item{var_pool_est}{Variance of the pooled estimate.}
 #'   \item{yw_est}{Ying-Wei variance-corrected KM estimate.}
 #'   \item{var_yw_est}{Variance of the Ying-Wei estimate.}
-#'   \item{cure_prob_list}{Per-group KM cure probabilities.}
-#'   \item{var_cure_prob}{Per-group variances (diagonal of covariance).}
+#'   \item{cure_prob_list}{Per-margin KM cure probabilities.}
+#'   \item{var_cure_prob}{Per-margin variances (diagonal of covariance).}
 #'   \item{invertible}{Logical, whether the weighted system was invertible.}
 #' }
 #'
 #' @export
-est.cure <- function(df, time, status, group) {
-  ls   <- .long_to_lists(df, time, status, group)
+est.cure <- function(df, time, status, margin) {
+  ls   <- .long_to_lists(df, time, status, margin)
   times_list  <- ls$times_list
   status_list <- ls$status_list
   k           <- length(times_list)
-  
+
   tau_hat <- p_hat <- numeric(k)
   for (i in seq_len(k)) {
     fit        <- survfit(Surv(times_list[[i]], status_list[[i]]) ~ 1)
     tau_hat[i] <- max(times_list[[i]], na.rm = TRUE)
     p_hat[i]   <- summary(fit, times = tau_hat[i], extend = TRUE)$surv
   }
-  
+
   V <- est.cov(
     times_list                        = times_list,
     status_list                       = status_list,
@@ -341,22 +341,22 @@ est.cure <- function(df, time, status, group) {
     time_points_list                  = tau_hat
   )
   one_vec <- rep(1, k)
-  
+
   sol1      <- solve.system(V, one_vec)
   inv_one   <- sol1$solve
   weight_vec       <- inv_one / sum(inv_one)
   weighted_est     <- sum(weight_vec * p_hat)
   var_weighted_est <- 1 / sum(inv_one)
-  
+
   ave_est     <- mean(p_hat)
   var_ave_est <- as.numeric((one_vec / k) %*% V %*% (one_vec / k))
-  
+
   pooled_times  <- unlist(times_list)
   pooled_status <- unlist(status_list)
   fit_pool <- survfit(Surv(pooled_times, pooled_status) ~ 1)
   pool_est     <- summary(fit_pool, times = max(tau_hat), extend = TRUE)$surv
   var_pool_est <- summary(fit_pool, times = max(tau_hat), extend = TRUE)$std.err^2
-  
+
   n_all <- length(pooled_times)
   pooled_df <- data.frame(
     time    = pooled_times,
@@ -370,7 +370,7 @@ est.cure <- function(df, time, status, group) {
   sum_yw     <- summary(km_yw, times = max(tau_hat), extend = TRUE)
   yw_est     <- sum_yw$surv
   var_yw_est <- sum_yw$se.surv^2
-  
+
   list(
     weight_vec        = weight_vec,
     weighted_est      = weighted_est,

@@ -2,9 +2,9 @@
 % Please edit documentation in R/multiCure.R
 \name{.long_to_lists}
 \alias{.long_to_lists}
-\title{Split and pad a long data frame by group}
+\title{Split and pad a long data frame by margin}
 \usage{
-.long_to_lists(df, time, status, group)
+.long_to_lists(df, time, status, margin)
 }
 \arguments{
 \item{df}{A data frame.}
@@ -13,7 +13,7 @@
 
 \item{status}{Unquoted column name of event indicator (0/1).}
 
-\item{group}{Unquoted column name of grouping factor.}
+\item{margin}{Unquoted column name of grouping factor.}
 }
 \value{
 A list with elements:
@@ -23,7 +23,7 @@ A list with elements:
 }
 }
 \description{
-Splits a long-format data frame by \code{group}, extracts \code{time} and \code{status} into lists,
+Splits a long-format data frame by \code{margin}, extracts \code{time} and \code{status} into lists,
 and pads each list with NAs so they are all equal length.
 }
 \keyword{internal}

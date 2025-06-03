@@ -4,16 +4,16 @@
 \alias{test.2.cure}
 \title{Two-sample cure-rate test}
 \usage{
-test.2.cure(df, time, status, group, type = c("paired", "indep"))
+test.2.cure(df, time, status, margin, type = c("paired", "indep"))
 }
 \arguments{
-\item{df}{A data frame in long format (one row per subject*group).}
+\item{df}{A data frame in long format (one row per subject*margin).}
 
 \item{time}{Unquoted name of the time column.}
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
-\item{group}{Unquoted name of the grouping variable (two levels).}
+\item{margin}{Unquoted name of the grouping variable (two levels).}
 
 \item{type}{Character: \code{"paired"} (default) or \code{"indep"}.}
 }
@@ -25,6 +25,6 @@ A list with components:
 }
 }
 \description{
-Performs a Wald-type test comparing cure rates between two groups,
+Performs a Wald-type test comparing cure rates between two margins,
 in either paired or independent fashion.
 }

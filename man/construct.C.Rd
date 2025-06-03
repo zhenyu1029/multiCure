@@ -7,7 +7,7 @@
 construct.C(k)
 }
 \arguments{
-\item{k}{Integer number of groups.}
+\item{k}{Integer number of margins.}
 }
 \value{
 A \\((k-1)\\times k\\) numeric matrix.

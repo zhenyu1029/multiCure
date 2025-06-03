@@ -4,7 +4,7 @@
 \alias{est.cure}
 \title{Estimate cure probabilities (weighted, average, pooled, Ying-Wei)}
 \usage{
-est.cure(df, time, status, group)
+est.cure(df, time, status, margin)
 }
 \arguments{
 \item{df}{A data frame in long format.}
@@ -13,7 +13,7 @@ est.cure(df, time, status, group)
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
-\item{group}{Unquoted name of the grouping factor.}
+\item{margin}{Unquoted name of the grouping factor.}
 }
 \value{
 A list containing:
@@ -27,8 +27,8 @@ A list containing:
 \item{var_pool_est}{Variance of the pooled estimate.}
 \item{yw_est}{Ying-Wei variance-corrected KM estimate.}
 \item{var_yw_est}{Variance of the Ying-Wei estimate.}
-\item{cure_prob_list}{Per-group KM cure probabilities.}
-\item{var_cure_prob}{Per-group variances (diagonal of covariance).}
+\item{cure_prob_list}{Per-margin KM cure probabilities.}
+\item{var_cure_prob}{Per-margin variances (diagonal of covariance).}
 \item{invertible}{Logical, whether the weighted system was invertible.}
 }
 }

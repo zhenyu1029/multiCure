@@ -2,9 +2,9 @@
 % Please edit documentation in R/multiCure.R
 \name{test.k.cure}
 \alias{test.k.cure}
-\title{Wald test across K groups for cure probabilities}
+\title{Wald test across K margins for cure probabilities}
 \usage{
-test.k.cure(df, time, status, group)
+test.k.cure(df, time, status, margin)
 }
 \arguments{
 \item{df}{A data frame in long format.}
@@ -13,7 +13,7 @@ test.k.cure(df, time, status, group)
 
 \item{status}{Unquoted name of the event indicator column (0/1).}
 
-\item{group}{Unquoted name of the grouping factor (with >= 2 levels).}
+\item{margin}{Unquoted name of the grouping factor (with >= 2 levels).}
 }
 \value{
 A list with:
@@ -25,5 +25,5 @@ A list with:
 }
 }
 \description{
-Tests equality of cure probabilities across \\(K\\) groups using a multivariate Wald statistic.
+Tests equality of cure probabilities across \\(K\\) margins using a multivariate Wald statistic.
 }

@@ -19,6 +19,6 @@ est.inf.fun(times1, status1, surv_prob_at_last_event_time1, time_point1)
 Numeric vector of the same length as \code{times1}, giving influence contributions (zeros for NAs).
 }
 \description{
-Computes the influence-function values \\(\\xi_j\\) for a single group at a specified time point.
+Computes the influence-function values \\(\\xi_j\\) for a single margin at a specified time point.
 }
 \keyword{internal}

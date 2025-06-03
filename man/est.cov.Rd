@@ -12,18 +12,18 @@ est.cov(
 )
 }
 \arguments{
-\item{times_list}{List of numeric vectors (one per group), all the same length (padded with NAs).}
+\item{times_list}{List of numeric vectors (one per margin), all the same length (padded with NAs).}
 
 \item{status_list}{List of integer (0/1) vectors, same structure as \code{times_list}.}
 
-\item{surv_prob_at_last_event_time_list}{Numeric vector of KM estimates (length = number of groups).}
+\item{surv_prob_at_last_event_time_list}{Numeric vector of KM estimates (length = number of margins).}
 
-\item{time_points_list}{Numeric vector of evaluation times (length = number of groups).}
+\item{time_points_list}{Numeric vector of evaluation times (length = number of margins).}
 }
 \value{
 A \\(k \\times k\\) covariance matrix.
 }
 \description{
-Given lists of per-group times and statuses, computes the covariance matrix of the influence functions.
+Given lists of per-margin times and statuses, computes the covariance matrix of the influence functions.
 }
 \keyword{internal}
