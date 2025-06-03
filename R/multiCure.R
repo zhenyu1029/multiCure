@@ -1,4 +1,4 @@
-#' @importFrom stats    na.omit pnorm pchisq
+#' @importFrom stats    na.omit pnorm pchisq qnorm
 #' @importFrom dplyr    %>% group_by group_split pull
 #' @importFrom rlang    enquo !!
 #' @importFrom purrr    map map_int

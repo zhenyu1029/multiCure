@@ -1,5 +1,5 @@
 ################################################################################
-# R/print‐methods.R
+# R/print-methods.R
 ################################################################################
 
 #---------------------------------------------
@@ -35,7 +35,7 @@ print.cure_test <- function(x, ...) {
 }
 
 #---------------------------------------------
-# 2a) summary.cure_test: compute 95% CI for p1−p2
+# 2a) summary.cure_test: compute 95% CI for p1-p2
 #---------------------------------------------
 #' @export
 summary.cure_test <- function(object, ...) {
@@ -92,7 +92,7 @@ print.summary.cure_test <- function(x, ...) {
               margin2, x$p_hat[2]))
 
   # Show difference + CI
-  cat(sprintf("Difference ( %s − %s ) = %.4f\n",
+  cat(sprintf("Difference ( %s - %s ) = %.4f\n",
               margin1, margin2, x$diff_hat))
   cat(sprintf("95%% CI for difference: [ %.4f , %.4f ]\n\n",
               x$conf_int["lower"], x$conf_int["upper"]))
@@ -224,7 +224,7 @@ print.cure_est <- function(x, ...) {
 
   # 4f) Warn if weighted covariance was singular
   if (!x$invertible) {
-    cat("\nWARNING: Covariance matrix was not invertible—weighted estimator may be unreliable.\n")
+    cat("\nWARNING: Covariance matrix was not invertible-weighted estimator may be unreliable.\n")
   }
   invisible(x)
 }
